@@ -61,16 +61,6 @@ public class WebSecurityConfig {
 
 
         http.authorizeRequests()
-//                // Comments 관련 설정
-//                .requestMatchers(HttpMethod.POST, "/comments/**").authenticated()
-//                .requestMatchers(HttpMethod.PUT, "/comments/**").authenticated()
-//                .requestMatchers(HttpMethod.DELETE, "/comments/**").authenticated()
-//
-//                // Posts 관련 설정
-//                .requestMatchers(HttpMethod.POST, "/posts/**").authenticated()
-//                .requestMatchers(HttpMethod.PUT, "/posts/**").authenticated()
-//                .requestMatchers(HttpMethod.DELETE, "/posts/**").authenticated()
-//
 //                // Reviews 관련 설정
 //                .requestMatchers(HttpMethod.POST, "/api/review/**").authenticated()
 //                .requestMatchers(HttpMethod.PUT, "/api/review/**").authenticated()
