@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -87,5 +89,8 @@ public class UserService {
         boolean exists = userRepository.findByNickname(nickname).isPresent();
         System.out.println("Nickname check for '" + nickname + "': " + exists);
         return exists;
+    }
+    public List<User> getAllUsers(){
+        return userRepository.findAll();
     }
 }
