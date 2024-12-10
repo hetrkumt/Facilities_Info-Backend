@@ -1,12 +1,12 @@
-package com.kitHub.Facilities_Info.util.login;
+package com.kitHub.Facilities_info.util.login;
 
-import com.kitHub.Facilities_Info.domain.RefreshToken;
-import com.kitHub.Facilities_Info.domain.User;
-import com.kitHub.Facilities_Info.repository.RefreshTokenRepository;
-import com.kitHub.Facilities_Info.repository.UserRepository;
+import com.kitHub.Facilities_info.domain.token.RefreshToken;
+import com.kitHub.Facilities_info.domain.user.User;
+import com.kitHub.Facilities_info.repository.token.RefreshTokenRepository;
+import com.kitHub.Facilities_info.repository.UserRepository;
 
-import com.kitHub.Facilities_Info.util.Authentication.AuthenticationProvider;
-import com.kitHub.Facilities_Info.util.jwt.JwtProvider;
+import com.kitHub.Facilities_info.util.Authentication.AuthenticationProvider;
+import com.kitHub.Facilities_info.util.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.Authentication;
@@ -47,7 +47,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         }
 
         String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
-         saveRefreshToken(user.getId(), refreshToken);
+        saveRefreshToken(user.getId(), refreshToken);
 
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
 
@@ -58,19 +58,13 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         return tokens;
     }
 
+
+
     private void saveRefreshToken(Long userId, String newRefreshToken) {
         RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId)
-                .map(entity -> {
-                    System.out.println("Existing refresh token found for user ID: " + userId);
-                    return entity.update(newRefreshToken);
-                })
-                .orElseGet(() -> {
-                    System.out.println("No existing refresh token found, creating new one for user ID: " + userId);
-                    return new RefreshToken(userId, newRefreshToken);
-                });
+                .map(entity -> entity.update(newRefreshToken))
+                .orElse(new RefreshToken(userId, newRefreshToken));
 
         refreshTokenRepository.save(refreshToken);
-        System.out.println("Refresh token for user ID " + userId + " has been saved: " + newRefreshToken);
     }
-
 }

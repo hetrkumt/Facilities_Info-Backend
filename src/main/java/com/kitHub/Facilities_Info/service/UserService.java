@@ -1,20 +1,23 @@
-package com.kitHub.Facilities_Info.service;
+package com.kitHub.Facilities_info.service;
 
-import com.kitHub.Facilities_Info.domain.User;
-
-import com.kitHub.Facilities_Info.domain.UserReview;
-import com.kitHub.Facilities_Info.dto.auth.AddLocalUserRequest;
-import com.kitHub.Facilities_Info.dto.auth.AddOauthUserRequest;
-import com.kitHub.Facilities_Info.repository.UserRepository;
+import com.kitHub.Facilities_info.domain.user.User;
+import com.kitHub.Facilities_info.domain.facility.UserReview;
+import com.kitHub.Facilities_info.dto.auth.AddLocalUserRequest;
+import com.kitHub.Facilities_info.dto.auth.AddOauthUserRequest;
+import com.kitHub.Facilities_info.repository.UserRepository;
+import com.kitHub.Facilities_info.util.Authentication.AuthenticationProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class UserService {
-
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
 
     public Long saveLocal(AddLocalUserRequest dto) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -43,25 +46,19 @@ public class UserService {
                 .build()).getId();
     }
 
-
     public User findById(Long userId) {
         return userRepository.findById(userId)
-               .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+                .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found"));
     }
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-               .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
-    }
-
-    public User findByNickname(String nickname) {
-        return userRepository.findByNickname(nickname)
-                .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+                .orElseThrow(() -> new IllegalArgumentException("User with email " + email + " not found"));
     }
 
     public User findBySnsId(String snsId) {
         return userRepository.findBySnsId(snsId)
-               .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+                .orElseThrow(() -> new IllegalArgumentException("User with snsId " + snsId + " not found"));
     }
 
     public User updateNickname(Long userId, String nickname) {
@@ -70,17 +67,25 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateUserReview (User user, UserReview userReview) {
+    public User updateUserReview(User user, UserReview userReview) {
         user.updateUserReview(userReview);
         return userRepository.save(user);
     }
 
+    public User getUserInfoIfMatchesAuthor(Long AuthorUserId) {
+        User loginUser = authenticationProvider.getUserInfoFromSecurityContextHolder();
+        return loginUser.getId().equals(AuthorUserId) ? loginUser : null;
+    }
+
     public boolean checkEmailExists(String email) {
-        return userRepository.findByEmail(email).isPresent();
+        boolean exists = userRepository.findByEmail(email).isPresent();
+        System.out.println("Email check for '" + email + "': " + exists);
+        return exists;
     }
 
-    public boolean checkNicknameExists(String nickname)  {
-        return userRepository.findByNickname(nickname).isPresent();
+    public boolean checkNicknameExists(String nickname) {
+        boolean exists = userRepository.findByNickname(nickname).isPresent();
+        System.out.println("Nickname check for '" + nickname + "': " + exists);
+        return exists;
     }
-
 }

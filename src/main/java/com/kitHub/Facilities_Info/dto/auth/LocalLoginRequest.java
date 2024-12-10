@@ -1,4 +1,4 @@
-package com.kitHub.Facilities_Info.dto.auth;
+package com.kitHub.Facilities_info.dto.auth;
 
 import lombok.Getter;
 import lombok.Setter;

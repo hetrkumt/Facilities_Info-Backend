@@ -1,4 +1,4 @@
-package com.kitHub.Facilities_Info.controller;
+package com.kitHub.Facilities_info.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +11,14 @@ public class ViewController {
         return "upload";
     }
 
-    @GetMapping("/image")
-    public String image() {
-        return "image";
+    @GetMapping("/addNotice")
+    public String addNotice() {
+        return "addNotice";
+    }
+
+    @GetMapping("/addFAQ")
+    public String addFAQ() {
+        return "addFAQ";
     }
 
 }

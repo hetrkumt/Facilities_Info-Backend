@@ -1,4 +1,4 @@
-package com.kitHub.Facilities_Info.util.jwt;
+package com.kitHub.Facilities_info.util.jwt;
 
 import lombok.Getter;
 import lombok.Setter;

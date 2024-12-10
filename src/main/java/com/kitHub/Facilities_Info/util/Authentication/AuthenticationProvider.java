@@ -1,7 +1,7 @@
-package com.kitHub.Facilities_Info.util.Authentication;
+package com.kitHub.Facilities_info.util.Authentication;
 
-import com.kitHub.Facilities_Info.domain.User;
-import com.kitHub.Facilities_Info.repository.UserRepository;
+import com.kitHub.Facilities_info.domain.user.User;
+import com.kitHub.Facilities_info.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -24,23 +24,23 @@ public class AuthenticationProvider {
     @Autowired
     private UserRepository userRepository;
 
-    public Authentication getAuthenticationFromSecurityContextHolder(){
+    public Authentication getAuthenticationFromSecurityContextHolder() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        System.out.println("getAuthenticationFromSecurityContextHolder - authentication: " + authentication);
+        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
             return authentication;
-        }
-        else{
+        } else {
             return null;
         }
     }
 
-    public void setAuthenticationtoSecurityContextHolder(Authentication authentication){
+    public void setAuthenticationtoSecurityContextHolder(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
     }
 
-    public Authentication makePreAuthenticationFrom(User user){
+    public Authentication makePreAuthenticationFrom(User user) {
         String userEmailOrSnsId = user.getEmail();
         if (user.getEmail() != null) {
             userEmailOrSnsId = user.getEmail();
@@ -48,8 +48,7 @@ public class AuthenticationProvider {
                     userEmailOrSnsId,
                     user.getPassword());
             return preAuth;
-        }
-        else {
+        } else {
             userEmailOrSnsId = user.getSnsId();
             Authentication preAuth = new UsernamePasswordAuthenticationToken(
                     userEmailOrSnsId,
@@ -59,27 +58,27 @@ public class AuthenticationProvider {
 
     }
 
-    public Authentication makeAuthenticationFrom(User user){
+    public Authentication makeAuthenticationFrom(User user) {
 
-        if (user.getProvider().equals("local")){
+        if (user.getProvider().equals("local")) {
             Authentication UsernamePasswordAuthentication = createUsernamePasswordAuthenticationTokenFrom(user);
             return UsernamePasswordAuthentication;
-        }
-        else{
+        } else {
             Authentication OAuth2Authentication = createOAuth2AuthenticationTokenFrom(user);
             return OAuth2Authentication;
         }
     }
 
     public Authentication createUsernamePasswordAuthenticationTokenFrom(User user) {
-        if (user.getEmail().equals("admin")){
+        String email = user.getEmail();
+
+        if (email.matches("^admin(1[0-5]|[1-9]?)$")) {
             return new UsernamePasswordAuthenticationToken(
                     user,
                     null,
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))
             );
-        }
-        else{
+        } else {
             return new UsernamePasswordAuthenticationToken(
                     user,
                     null,
@@ -88,7 +87,6 @@ public class AuthenticationProvider {
         }
     }
 
-    // AnonymousAuthenticationToken 생성
     public Authentication createAnonymousAuthenticationTokenFrom() {
         return new AnonymousAuthenticationToken(
                 "key",
@@ -97,7 +95,6 @@ public class AuthenticationProvider {
         );
     }
 
-    // OAuth2AuthenticationToken 생성
     public Authentication createOAuth2AuthenticationTokenFrom(User user) {
         Map<String, Object> attributes = Map.of(
                 "id", user.getId(),
@@ -120,29 +117,35 @@ public class AuthenticationProvider {
         );
     }
 
-    public User getUserInfoFromSecurityContextHolder(){
+    public User getUserInfoFromSecurityContextHolder() {
         Authentication authentication = getAuthenticationFromSecurityContextHolder();
+        if (authentication == null) {
+            System.out.println("SecurityContextHolder에 인증된 정보가 없습니다.");
+            return null;
+        }
         User user = getUserInfoFrom(authentication);
+        System.out.println("getUserInfoFromSecurityContextHolder - user: " + user);
         return user;
     }
 
-    private User getUserInfoFrom(Authentication authentication){
+    private User getUserInfoFrom(Authentication authentication) {
         Long userId = null;
-        if (authentication instanceof UsernamePasswordAuthenticationToken){
+        if (authentication instanceof UsernamePasswordAuthenticationToken) {
             User user = (User) ((UsernamePasswordAuthenticationToken) authentication).getPrincipal();
             userId = user.getId();
-        }
-        else if (authentication instanceof OAuth2AuthenticationToken){
+        } else if (authentication instanceof OAuth2AuthenticationToken) {
             Map<String, Object> attributes = ((OAuth2AuthenticationToken) authentication).getPrincipal().getAttributes();
             userId = (Long) attributes.get("id");
         }
-
-        Optional <User> userOpt = userRepository.findById(String.valueOf(userId));
-        if (userOpt.isPresent()){
+        if (userId == null) {
+            System.out.println("Authentication 객체에 userId가 없습니다.");
+            return null;
+        }
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
             System.out.println("User " + userOpt.get().getNickname());
             return userOpt.get();
-        }
-        else{
+        } else {
             System.out.println("User not found");
             return null;
         }

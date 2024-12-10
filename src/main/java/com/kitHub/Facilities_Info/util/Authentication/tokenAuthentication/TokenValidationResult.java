@@ -1,4 +1,4 @@
-package com.kitHub.Facilities_Info.util.Authentication.tokenAuthentication;
+package com.kitHub.Facilities_info.util.Authentication.tokenAuthentication;
 
 public enum TokenValidationResult {
     VALID,

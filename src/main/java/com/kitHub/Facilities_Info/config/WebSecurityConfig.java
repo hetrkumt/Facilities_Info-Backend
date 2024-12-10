@@ -1,30 +1,27 @@
-package com.kitHub.Facilities_Info.config;
+package com.kitHub.Facilities_info.config;
 
-import com.kitHub.Facilities_Info.repository.RefreshTokenRepository;
-import com.kitHub.Facilities_Info.service.UserService;
-import com.kitHub.Facilities_Info.util.jwt.JwtProvider;
-import com.kitHub.Facilities_Info.util.Authentication.AuthenticationProvider;
-import com.kitHub.Facilities_Info.util.Authentication.tokenAuthentication.TokenAuthenticationManager;
+import com.kitHub.Facilities_info.util.jwt.JwtProvider;
+import com.kitHub.Facilities_info.util.Authentication.AuthenticationProvider;
+import com.kitHub.Facilities_info.util.Authentication.tokenAuthentication.TokenAuthenticationManager;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @RequiredArgsConstructor
 @Configuration
+
 public class WebSecurityConfig {
 
     private final JwtProvider tokenProvider;
@@ -58,17 +55,48 @@ public class WebSecurityConfig {
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        // TokenAuthenticationFilter 추가
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
+
+
         http.authorizeRequests()
+//                // Comments 관련 설정
+//                .requestMatchers(HttpMethod.POST, "/comments/**").authenticated()
+//                .requestMatchers(HttpMethod.PUT, "/comments/**").authenticated()
+//                .requestMatchers(HttpMethod.DELETE, "/comments/**").authenticated()
+//
+//                // Posts 관련 설정
+//                .requestMatchers(HttpMethod.POST, "/posts/**").authenticated()
+//                .requestMatchers(HttpMethod.PUT, "/posts/**").authenticated()
+//                .requestMatchers(HttpMethod.DELETE, "/posts/**").authenticated()
+//
+//                // Reviews 관련 설정
+//                .requestMatchers(HttpMethod.POST, "/api/review/**").authenticated()
+//                .requestMatchers(HttpMethod.PUT, "/api/review/**").authenticated()
+//                .requestMatchers(HttpMethod.DELETE, "/api/review/**").authenticated()
+//
+//                // Reports 관련 설정
+//                .requestMatchers(HttpMethod.POST, "/reports/**").authenticated()
+//
+//                // Admin 관련 설정
+//                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                // 나머지 요청에 대한 설정
                 .anyRequest().permitAll();
+
+//                .and()
+//                .exceptionHandling()
+//                .authenticationEntryPoint((request, response, authException) -> {
+//                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Please log in to access this resource.");
+//                });
 
         http.headers()
                 .frameOptions().disable(); // H2 콘솔 사용을 위해 프레임 옵션 비활성화
 
-        http.exceptionHandling()
-                .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                        new AntPathRequestMatcher("/api/**"));
+//        http.exceptionHandling()
+//                .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+//                        new AntPathRequestMatcher("/api/**"));
 
         return http.build();
     }
@@ -77,6 +105,12 @@ public class WebSecurityConfig {
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter(tokenProvider, tokenAuthenticationManager, authenticationProvider);
     }
+
+//    @Bean
+//    public AdminAccessFilter adminAccessFilter() {
+//
+//        return new AdminAccessFilter(authenticationProvider);
+//    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {

@@ -1,8 +1,8 @@
-package com.kitHub.Facilities_Info.util.Authentication.loginAuthentication;
+package com.kitHub.Facilities_info.util.Authentication.loginAuthentication;
 
-import com.kitHub.Facilities_Info.domain.User;
-import com.kitHub.Facilities_Info.repository.UserRepository;
-import com.kitHub.Facilities_Info.util.Authentication.AuthenticationProvider;
+import com.kitHub.Facilities_info.domain.user.User;
+import com.kitHub.Facilities_info.repository.UserRepository;
+import com.kitHub.Facilities_info.util.Authentication.AuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

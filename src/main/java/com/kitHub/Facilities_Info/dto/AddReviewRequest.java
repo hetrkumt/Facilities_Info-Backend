@@ -1,4 +1,4 @@
-package com.kitHub.Facilities_Info.dto;
+package com.kitHub.Facilities_info.dto;
 
 import lombok.Getter;
 import lombok.Setter;

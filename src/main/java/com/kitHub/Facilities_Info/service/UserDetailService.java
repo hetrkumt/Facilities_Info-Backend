@@ -1,7 +1,7 @@
-package com.kitHub.Facilities_Info.service;
+package com.kitHub.Facilities_info.service;
 
-import com.kitHub.Facilities_Info.domain.User;
-import com.kitHub.Facilities_Info.repository.UserRepository;
+import com.kitHub.Facilities_info.domain.user.User;
+import com.kitHub.Facilities_info.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
