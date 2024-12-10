@@ -27,6 +27,8 @@ SELECT * FROM facility_geo_coordinates;
 -- Facility 데이터 확인
 SELECT * FROM facilities;
 
+SELECT * FROM users;
+
 -- DetailedLocation 데이터 확인
 SELECT * FROM detailed_locations;
 
@@ -35,6 +37,10 @@ SELECT * FROM email_verification_tokens;
 SELECT * FROM refesh_tokens
 
 DESCRIBE notices;
+
+SET SESSION query_cache_type = OFF;
+SET SESSION query_cache_size = 0;
+
 
 DROP TABLE IF EXISTS email_verification_tokens;
 SHOW TABLE;
@@ -146,6 +152,8 @@ SELECT * FROM facility_geo_coordinates;
 -- Facility 데이터 확인
 SELECT * FROM facilities;
 
+SELECT * FROM users;
+
 -- DetailedLocation 데이터 확인
 SELECT * FROM detailed_locations;
 
@@ -233,7 +241,10 @@ COMMIT;]]></console>
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="c171eb95-126c-4bc0-bf01-d0703265c705" object-ref="consoles/Connection" />
+      <object connection-id="ddc5d598-bb87-41c8-a6ad-56118bff8413" object-ref="consoles/Facility_db" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="ddc5d598-bb87-41c8-a6ad-56118bff8413" />

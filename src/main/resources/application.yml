@@ -7,15 +7,15 @@ spring:
       charset: UTF-8
       enabled: true
       force: true
-#  datasource:
-#    url: jdbc:mysql://3.34.105.70:3306/facility_db?useUnicode=true&characterEncoding=UTF-8
-#    username: root
-#    password: kithub
-
   datasource:
-    url: jdbc:mysql://localhost:3306/facility_db?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://3.34.105.70:3306/facility_db?useUnicode=true&characterEncoding=UTF-8
     username: root
-    password: mysql
+    password: kithub
+
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/facility_db?useUnicode=true&characterEncoding=UTF-8
+#    username: root
+#    password: mysql
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL57Dialect

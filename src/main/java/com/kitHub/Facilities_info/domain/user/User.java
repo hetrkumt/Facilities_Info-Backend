@@ -44,7 +44,7 @@ public class User implements UserDetails {
     private String snsId;
 
     @Column(nullable = false)
-    private boolean isBlocked = false;  // 추가: 차단 여부
+    private boolean isBlocked = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference

@@ -60,6 +60,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 
 
+
     private void saveRefreshToken(Long userId, String newRefreshToken) {
         RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId)
                 .map(entity -> entity.update(newRefreshToken))
@@ -68,3 +69,4 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         refreshTokenRepository.save(refreshToken);
     }
 }
+

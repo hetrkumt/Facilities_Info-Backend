@@ -2,6 +2,7 @@ package com.kitHub.Facilities_info.controller.auth;
 
 
 import com.kitHub.Facilities_info.domain.user.User;
+import com.kitHub.Facilities_info.dto.LoginSuccessRespone;
 import com.kitHub.Facilities_info.dto.auth.AddLocalUserRequest;
 import com.kitHub.Facilities_info.dto.auth.AddOauthUserRequest;
 import com.kitHub.Facilities_info.dto.auth.LocalLoginRequest;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,44 +89,62 @@ public class AuthApiController {
     }
 
     @PostMapping("/local/login")
-    public ResponseEntity<Map<String, String>> localLogin(@RequestBody LocalLoginRequest dto) {
+    public ResponseEntity<LoginSuccessRespone> localLogin(@RequestBody LocalLoginRequest dto) {
         AuthenticationResult result = loginService.localLogin(dto);
         return handleAuthenticationResult(result);
     }
 
     @PostMapping("/oauth/login")
-    public ResponseEntity<Map<String, String>> OAuthLogin(@RequestBody OAuthLoginRequest dto) {
+    public ResponseEntity<LoginSuccessRespone> OAuthLogin(@RequestBody OAuthLoginRequest dto) {
         AuthenticationResult result = loginService.OAuthLogin(dto);
         return handleAuthenticationResult(result);
     }
 
-    private ResponseEntity<Map<String, String>> handleAuthenticationResult(AuthenticationResult result) {
+    private ResponseEntity<LoginSuccessRespone> handleAuthenticationResult(AuthenticationResult result) {
         HttpHeaders headers = new HttpHeaders();
         Map<String, String> tokens = new HashMap<>();
+        LoginSuccessRespone loginSuccessRespone = new LoginSuccessRespone();
         switch (result) {
             case SUCCESS:
                 tokens = loginSuccessHandler.makeTokensOnAuthenticationSuccess();
                 String accessToken = tokens.get("accessToken");
                 String refreshToken = tokens.get("refreshToken");
+                User user = authenticationProvider.getUserInfoFromSecurityContextHolder();
                 headers.add("AccessToken", accessToken);
                 headers.add("RefreshToken", refreshToken);
                 // 디버그 로그 추가
                 System.out.println("Access Token: " + accessToken);
                 System.out.println("Refresh Token: " + refreshToken);
                 System.out.println("Response Headers: " + headers);
+
+                // 사용자 상태에 따른 메시지 반환
+                String message;
+                if (user.isBlocked()) {
+                    message = "차단된 사용자입니다.";
+                } else if (user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                    message = "관리자입니다.";
+                } else {
+                    message = "일반 사용자입니다.";
+                }
+
+                loginSuccessRespone.setUser(user);
+                loginSuccessRespone.setAccessToken(accessToken);
+                loginSuccessRespone.setRefreshToken(refreshToken);
+                loginSuccessRespone.setMessage(message);
+
                 return ResponseEntity.ok()
                         .headers(headers)
-                        .body(tokens);
+                        .body(loginSuccessRespone);
 
             case USER_NOT_FOUND:
-                tokens.put("error", "User not found");
-                return ResponseEntity.status(404).body(tokens);
+                loginSuccessRespone.setMessage("User not found");
+                return ResponseEntity.status(404).body(loginSuccessRespone);
             case INVALID_PASSWORD:
-                tokens.put("error", "Invalid password");
-                return ResponseEntity.status(401).body(tokens);
+                loginSuccessRespone.setMessage("Invalid password");
+                return ResponseEntity.status(401).body(loginSuccessRespone);
             default:
-                tokens.put("error", "Authentication failed");
-                return ResponseEntity.status(500).body(tokens);
+                loginSuccessRespone.setMessage("Authentication failed");
+                return ResponseEntity.status(500).body(loginSuccessRespone);
         }
     }
 
